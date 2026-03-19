@@ -94,6 +94,11 @@
       cursor: pointer;
       perspective: 1200px;
       transition: transform 0.15s;
+      overflow: hidden;
+    }
+    .envelope-wrap.opening,
+    .envelope-wrap.opened {
+      overflow: visible;
     }
     .envelope-wrap:not(.opened):hover {
       transform: translateY(-3px);
@@ -214,7 +219,7 @@
 
     .envelope-wrap.opening .card,
     .envelope-wrap.opened  .card {
-      transform: translateY(-395px);
+      transform: translateY(-330px);
     }
 
     .card-header {
@@ -432,7 +437,7 @@
       }
       .envelope-wrap.opening .card,
       .envelope-wrap.opened  .card {
-        transform: translateY(-105vw);
+        transform: translateY(-82vw);
       }
 
       .card-header { padding: 8px 12px; gap: 8px; }
