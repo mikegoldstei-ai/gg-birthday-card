@@ -95,10 +95,6 @@
       perspective: 1200px;
       transition: transform 0.15s;
     }
-    @media (max-width: 480px) {
-      .envelope-wrap { width: 340px; height: 220px; }
-      .card { left: 14px !important; right: 14px !important; }
-    }
     .envelope-wrap:not(.opened):hover {
       transform: translateY(-3px);
     }
@@ -394,6 +390,71 @@
       text-align: center;
       text-transform: uppercase;
     }
+
+    /* ── MOBILE ── */
+    @media (max-width: 480px) {
+      body { padding: 1rem 0.5rem; }
+      .scene { padding: 1.5rem 0.5rem; }
+
+      .brand-bar { margin-bottom: 1.5rem; gap: 8px; }
+      .brand-gg { font-size: 22px; }
+      .brand-name { font-size: 13px; }
+      .brand-sub { font-size: 8px; }
+      .brand-divider { height: 22px; }
+
+      .hint { font-size: 12px; margin-bottom: 1.2rem; }
+
+      .envelope-wrap {
+        width: 92vw;
+        max-width: 340px;
+        height: 60vw;
+        max-height: 220px;
+      }
+
+      .env-inside, .env-body, .env-sides, .env-bottom {
+        height: 82%;
+      }
+      .env-flap { height: 54%; }
+
+      .seal {
+        top: 42%;
+        width: 44px;
+        height: 44px;
+        font-size: 12px;
+      }
+      .seal-sub { font-size: 7px; }
+
+      .card {
+        left: 12px;
+        right: 12px;
+        height: 78%;
+        bottom: 8px;
+      }
+      .envelope-wrap.opening .card,
+      .envelope-wrap.opened  .card {
+        transform: translateY(-75vw);
+      }
+
+      .card-header { padding: 8px 12px; gap: 8px; }
+      .card-logo-gg { font-size: 16px; }
+      .card-logo-divider { height: 22px; }
+      .card-firm-name { font-size: 10px; }
+      .card-firm-sub { font-size: 7px; }
+
+      .card-body { padding: 8px 14px 6px; }
+      .gold-rule { width: 36px; margin-bottom: 6px; }
+      .bday-heading { font-size: 17px; margin-bottom: 2px; }
+      .recipient { font-size: 13px; margin-bottom: 6px; }
+      .card-message { font-size: 10px; line-height: 1.6; margin-bottom: 8px; max-width: 260px; }
+      .card-cta { font-size: 9px; padding: 7px 16px; }
+
+      .card-footer-strip { padding: 5px 10px; gap: 6px; }
+      .footer-item { font-size: 8px; }
+      .footer-dot { width: 2px; height: 2px; }
+
+      .reset-btn { margin-top: 1.2rem; font-size: 11px; padding: 7px 18px; }
+      .page-footer { margin-top: 1.5rem; font-size: 9px; }
+    }
   </style>
 </head>
 <body>
@@ -409,7 +470,7 @@
       </div>
     </div>
 
-    <div class="hint" id="hint">Click the envelope to open your birthday card</div>
+    <div class="hint" id="hint"></div>
 
     <div class="envelope-wrap" id="env" onclick="openEnv()">
 
@@ -491,6 +552,11 @@
     const params = new URLSearchParams(window.location.search);
     const firstName = params.get('name') || 'Friend';
     document.getElementById('recipientName').textContent = firstName;
+
+    // Tap vs Click based on device
+    const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    document.getElementById('hint').textContent =
+      (isMobile ? 'Tap' : 'Click') + ' the envelope to open your birthday card';
 
     let opened = false;
 
