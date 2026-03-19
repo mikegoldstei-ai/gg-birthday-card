@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Happy Birthday from Goldstein &amp; Goldstein</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #0d1219;
+      font-family: Arial, 'Helvetica Neue', sans-serif;
+      padding: 2rem 1rem;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(ellipse 60% 40% at 20% 30%, rgba(201,160,80,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 60% at 80% 70%, rgba(28,37,53,0.8) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .scene {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-width: 560px;
+      padding: 3rem 1rem 3rem;
+    }
+
+    .brand-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 2.5rem;
+      opacity: 0.85;
+    }
+    .brand-gg {
+      font-size: 28px;
+      font-weight: bold;
+      color: #c9a050;
+      letter-spacing: 2px;
+    }
+    .brand-divider {
+      width: 1px;
+      height: 28px;
+      background: #c9a050;
+      opacity: 0.4;
+    }
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+    .brand-name {
+      font-size: 18px;
+      font-weight: bold;
+      color: #ffffff;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .brand-sub {
+      font-size: 10px;
+      color: #c9a050;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .hint {
+      font-size: 13px;
+      color: #5a6a80;
+      margin-bottom: 1.8rem;
+      letter-spacing: 0.08em;
+      transition: opacity 0.5s;
+    }
+
+    /* ── ENVELOPE ── */
+    .envelope-wrap {
+      position: relative;
+      width: 430px;
+      height: 275px;
+      cursor: pointer;
+      perspective: 1200px;
+      transition: transform 0.15s;
+    }
+    @media (max-width: 480px) {
+      .envelope-wrap { width: 340px; height: 220px; }
+      .card { left: 14px !important; right: 14px !important; }
+    }
+    .envelope-wrap:not(.opened):hover {
+      transform: translateY(-3px);
+    }
+    .envelope-wrap.opened { cursor: default; }
+
+    .env-inside {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 252px;
+      background: #1a2030;
+      border-radius: 3px 3px 6px 6px;
+      z-index: 1;
+    }
+
+    .env-body {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 252px;
+      background: #1c2535;
+      border-radius: 3px 3px 6px 6px;
+      border: 2px solid #c9a050;
+      z-index: 2;
+      transition: background 0.2s;
+    }
+    .envelope-wrap:not(.opened):hover .env-body { background: #243050; }
+
+    .env-sides {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 252px;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .env-sides svg { width: 100%; height: 100%; }
+
+    .env-bottom {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 252px;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .env-bottom svg { width: 100%; height: 100%; }
+
+    .env-flap {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 148px;
+      z-index: 5;
+      transform-origin: top center;
+      transform: rotateX(0deg);
+      transition: transform 0.85s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+    .env-flap svg { width: 100%; height: 100%; }
+
+    .envelope-wrap.opening .env-flap,
+    .envelope-wrap.opened  .env-flap {
+      transform: rotateX(-180deg);
+      z-index: 1;
+    }
+
+    .seal {
+      position: absolute;
+      top: 124px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 54px;
+      height: 54px;
+      background: #c9a050;
+      border-radius: 50%;
+      z-index: 6;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #1c2535;
+      pointer-events: none;
+      color: #1c2535;
+      font-size: 14px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      line-height: 1;
+      transition: opacity 0.35s, transform 0.35s;
+    }
+    .seal-sub {
+      font-size: 6px;
+      letter-spacing: 0.5px;
+      color: #1c2535;
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .envelope-wrap.opening .seal,
+    .envelope-wrap.opened  .seal {
+      opacity: 0;
+      transform: translateX(-50%) scale(0.35);
+    }
+
+    /* ── CARD ── */
+    .card {
+      position: absolute;
+      left: 20px; right: 20px;
+      height: 230px;
+      background: #ffffff;
+      border-radius: 2px;
+      border: 1.5px solid #c9a050;
+      z-index: 4;
+      bottom: 12px;
+      transform: translateY(0px);
+      transition: transform 0.95s cubic-bezier(0.22, 1, 0.36, 1) 0.55s;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+
+    .envelope-wrap.opening .card,
+    .envelope-wrap.opened  .card {
+      transform: translateY(-285px);
+    }
+
+    .card-header {
+      background: #1c2535;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .card-logo-gg {
+      font-size: 20px;
+      font-weight: bold;
+      color: #c9a050;
+      letter-spacing: 1px;
+      line-height: 1;
+    }
+    .card-logo-divider {
+      width: 1px;
+      height: 28px;
+      background: #c9a050;
+      opacity: 0.45;
+      flex-shrink: 0;
+    }
+    .card-firm-name {
+      font-size: 12.5px;
+      font-weight: bold;
+      color: #ffffff;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      line-height: 1.25;
+    }
+    .card-firm-sub {
+      font-size: 9px;
+      color: #c9a050;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .card-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 22px 8px;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.65s 1.35s, transform 0.65s 1.35s;
+    }
+    .envelope-wrap.opened .card-body {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .gold-rule {
+      width: 50px;
+      height: 2px;
+      background: #c9a050;
+      margin: 0 auto 10px;
+    }
+    .bday-heading {
+      font-size: 21px;
+      color: #1c2535;
+      font-family: Georgia, serif;
+      font-style: italic;
+      font-weight: normal;
+      margin-bottom: 3px;
+    }
+    .recipient {
+      font-size: 15px;
+      color: #c9a050;
+      font-weight: bold;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 9px;
+    }
+    .card-message {
+      font-size: 11px;
+      color: #4a4a5a;
+      line-height: 1.75;
+      margin-bottom: 11px;
+      font-family: Georgia, serif;
+      font-style: italic;
+      max-width: 320px;
+    }
+    .card-cta {
+      display: inline-block;
+      background: #c9a050;
+      color: #1c2535;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 8px 20px;
+      border-radius: 2px;
+      text-decoration: none;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-family: Arial, sans-serif;
+      transition: background 0.2s, color 0.2s;
+    }
+    .card-cta:hover {
+      background: #e0b860;
+      color: #0f1520;
+    }
+
+    .card-footer-strip {
+      background: #1c2535;
+      padding: 6px 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .footer-item {
+      font-size: 9px;
+      color: #8a9ab0;
+      letter-spacing: 0.05em;
+      font-family: Arial, sans-serif;
+      text-decoration: none;
+    }
+    .footer-item.gold { color: #c9a050; }
+    .footer-item.gold:hover { color: #e0c070; }
+    .footer-dot {
+      width: 3px; height: 3px;
+      background: #c9a050;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .reset-btn {
+      margin-top: 2rem;
+      background: transparent;
+      border: 1px solid #c9a05060;
+      color: #5a6a80;
+      font-size: 12px;
+      padding: 8px 22px;
+      border-radius: 2px;
+      cursor: pointer;
+      font-family: Arial, sans-serif;
+      letter-spacing: 0.06em;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s, background 0.2s, color 0.2s, border-color 0.2s;
+    }
+    .reset-btn.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .reset-btn:hover {
+      background: #1c2535;
+      color: #c9a050;
+      border-color: #c9a050;
+    }
+
+    .confetti-wrap {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 100;
+    }
+    .cp { position: absolute; opacity: 0; }
+
+    .page-footer {
+      position: relative;
+      z-index: 1;
+      margin-top: 3rem;
+      font-size: 10px;
+      color: #3a4050;
+      letter-spacing: 0.1em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="scene">
+
+    <div class="brand-bar">
+      <span class="brand-gg">GG</span>
+      <div class="brand-divider"></div>
+      <div class="brand-text">
+        <span class="brand-name">Goldstein &amp; Goldstein, LLP</span>
+        <span class="brand-sub">Personal Injury Attorneys &middot; Est. 1997</span>
+      </div>
+    </div>
+
+    <div class="hint" id="hint">Click the envelope to open your birthday card</div>
+
+    <div class="envelope-wrap" id="env" onclick="openEnv()">
+
+      <div class="env-inside"></div>
+
+      <div class="card" id="card">
+        <div class="card-header">
+          <span class="card-logo-gg">GG</span>
+          <div class="card-logo-divider"></div>
+          <div>
+            <div class="card-firm-name">Goldstein &amp; Goldstein, LLP</div>
+            <div class="card-firm-sub">Personal Injury Attorneys</div>
+          </div>
+        </div>
+
+        <div class="card-body" id="cardBody">
+          <div class="gold-rule"></div>
+          <div class="bday-heading">Happy Birthday!</div>
+          <div class="recipient" id="recipientName"></div>
+          <p class="card-message">
+            On behalf of everyone here at Goldstein &amp; Goldstein, we want to wish you
+            a very Happy Birthday! We hope your special day is filled with joy, good health,
+            and celebration with the people who matter most to you. For nearly 30 years,
+            it has been our privilege to serve clients like you.
+          </p>
+          <a class="card-cta" href="https://goldsteinlaw.com/contact" target="_blank">
+            Free Consultation &mdash; No Recovery, No Fee
+          </a>
+        </div>
+
+        <div class="card-footer-strip">
+          <a class="footer-item gold" href="tel:9734004000">(973) 400-4000</a>
+          <div class="footer-dot"></div>
+          <a class="footer-item" href="https://goldsteinlaw.com" target="_blank">goldsteinlaw.com</a>
+        </div>
+
+      </div>
+
+      <div class="env-body"></div>
+
+      <div class="env-sides">
+        <svg viewBox="0 0 430 252" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="0,0 0,252 215,126"   fill="#151e2d" stroke="#c9a050" stroke-width="0.8"/>
+          <polygon points="430,0 430,252 215,126" fill="#151e2d" stroke="#c9a050" stroke-width="0.8"/>
+        </svg>
+      </div>
+
+      <div class="env-bottom">
+        <svg viewBox="0 0 430 252" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="0,252 215,124 430,252" fill="#0f1520" stroke="#c9a050" stroke-width="0.8"/>
+        </svg>
+      </div>
+
+      <div class="env-flap" id="flap">
+        <svg viewBox="0 0 430 148" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="0,0 430,0 215,136" fill="#1c2535" stroke="#c9a050" stroke-width="0.8"/>
+          <line x1="40" y1="16" x2="390" y2="16" stroke="#c9a050" stroke-width="0.5"
+                stroke-dasharray="6,6" opacity="0.4"/>
+        </svg>
+      </div>
+
+      <div class="seal" id="seal">
+        GG
+        <span class="seal-sub">LLP</span>
+      </div>
+
+    </div>
+
+    <button class="reset-btn" id="resetBtn" onclick="resetEnv()">Close envelope</button>
+
+  </div>
+
+  <div class="confetti-wrap" id="confetti"></div>
+
+  <div class="page-footer">Goldstein &amp; Goldstein, LLP &middot; East Orange, NJ &middot; Available 24/7</div>
+
+  <script>
+    // Read name from URL parameter: ?name=FirstName
+    const params = new URLSearchParams(window.location.search);
+    const firstName = params.get('name') || 'Friend';
+    document.getElementById('recipientName').textContent = firstName;
+
+    let opened = false;
+
+    function openEnv() {
+      if (opened) return;
+      opened = true;
+
+      const env      = document.getElementById('env');
+      const hint     = document.getElementById('hint');
+      const resetBtn = document.getElementById('resetBtn');
+
+      env.classList.add('opening');
+      hint.style.opacity = '0';
+
+      setTimeout(() => {
+        env.classList.remove('opening');
+        env.classList.add('opened');
+        launchConfetti();
+        setTimeout(() => resetBtn.classList.add('visible'), 1700);
+      }, 850);
+    }
+
+    function resetEnv() {
+      opened = false;
+      document.getElementById('env').classList.remove('opened', 'opening');
+      document.getElementById('hint').style.opacity = '1';
+      document.getElementById('resetBtn').classList.remove('visible');
+      document.getElementById('confetti').innerHTML = '';
+    }
+
+    function launchConfetti() {
+      const wrap   = document.getElementById('confetti');
+      const colors = ['#c9a050', '#1c2535', '#e8c878', '#8a9ab0', '#ffffff', '#d4aa60'];
+
+      for (let i = 0; i < 70; i++) {
+        const p = document.createElement('div');
+        p.className = 'cp';
+        const isRect  = Math.random() > 0.35;
+        const color   = colors[Math.floor(Math.random() * colors.length)];
+        const w       = isRect ? (6 + Math.random() * 6)  : 5;
+        const h       = isRect ? (5 + Math.random() * 10) : 5;
+        const left    = 5 + Math.random() * 90;
+        const rot     = Math.random() * 360;
+        p.style.cssText = `
+          left: ${left}%;
+          top: -14px;
+          width: ${w}px;
+          height: ${h}px;
+          background: ${color};
+          border-radius: ${isRect ? '1px' : '50%'};
+          transform: rotate(${rot}deg);
+        `;
+        wrap.appendChild(p);
+
+        const delay   = Math.random() * 600;
+        const dur     = 1200 + Math.random() * 900;
+        const drift   = (Math.random() - 0.5) * 140;
+        const fall    = 300 + Math.random() * 250;
+        const spinEnd = 300 + Math.random() * 400;
+
+        p.animate([
+          { opacity: 0,   transform: `translateY(0px)    translateX(0px)     rotate(${rot}deg)` },
+          { opacity: 1,   offset: 0.07 },
+          { opacity: 0.9, offset: 0.70 },
+          { opacity: 0,   transform: `translateY(${fall}px) translateX(${drift}px) rotate(${rot + spinEnd}deg)` }
+        ], { delay, duration: dur, fill: 'forwards', easing: 'ease-in' });
+      }
+    }
+  </script>
+
+</body>
+</html>
