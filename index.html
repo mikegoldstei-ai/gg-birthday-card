@@ -94,11 +94,11 @@
       cursor: pointer;
       perspective: 1200px;
       transition: transform 0.15s;
-      overflow: hidden;
+      clip-path: inset(0);
     }
     .envelope-wrap.opening,
     .envelope-wrap.opened {
-      overflow: visible;
+      clip-path: none;
     }
     .envelope-wrap:not(.opened):hover {
       transform: translateY(-3px);
@@ -580,6 +580,17 @@
         env.classList.remove('opening');
         env.classList.add('opened');
         launchConfetti();
+
+        // Scroll the card into center view
+        setTimeout(() => {
+          const card = document.getElementById('card');
+          const rect = card.getBoundingClientRect();
+          const cardCenter = rect.top + rect.height / 2;
+          const viewCenter = window.innerHeight / 2;
+          const scrollBy = cardCenter - viewCenter;
+          window.scrollBy({ top: scrollBy, behavior: 'smooth' });
+        }, 200);
+
         setTimeout(() => resetBtn.classList.add('visible'), 1700);
       }, 850);
     }
